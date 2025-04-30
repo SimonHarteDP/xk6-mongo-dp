@@ -1,6 +1,8 @@
 module github.com/SimonHarteDP/xk6-mongo-dp
 
-go 1.20
+go 1.23.0
+
+toolchain go1.24.0
 
 require (
 	go.k6.io/k6 v0.51.1-0.20240610082146-1f01a9bc2365

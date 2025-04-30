@@ -44,7 +44,7 @@ func (m *Mongo) NewClient(connURI string) *Client {
 
 func (*Mongo) NewClientWithOptions(connURI string, clientOptions *options.ClientOptions) *Client {
 	log.Print("start creating new client")
-
+	log.Printf("connURI: %s", connURI)
 	clientOptions.ApplyURI(connURI)
 
 	client, err := mongo.Connect(context.Background(), clientOptions)

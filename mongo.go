@@ -31,8 +31,8 @@ type UpsertOneModel struct {
 }
 
 type Response struct {
-	err    error
-	result any
+	Err    error
+	Result any
 }
 
 // NewClient represents the Client constructor (i.e. `new mongo.Client()`) and
@@ -63,10 +63,10 @@ func (c *Client) Insert(database string, collection string, doc interface{}) Res
 	_, err := col.InsertOne(context.Background(), doc)
 	if err != nil {
 		log.Printf("Error while inserting document: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 	log.Print("Document inserted successfully")
-	return Response{result: doc}
+	return Response{Result: doc}
 }
 
 func (c *Client) InsertMany(database string, collection string, docs []interface{}) Response {
@@ -75,9 +75,9 @@ func (c *Client) InsertMany(database string, collection string, docs []interface
 	_, err := col.InsertMany(context.Background(), docs)
 	if err != nil {
 		log.Printf("Error while inserting multiple documents: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
-	return Response{result: col}
+	return Response{Result: col}
 }
 
 func (c *Client) Upsert(database string, collection string, filter interface{}, upsert interface{}) Response {
@@ -87,9 +87,9 @@ func (c *Client) Upsert(database string, collection string, filter interface{}, 
 	_, err := col.UpdateOne(context.Background(), filter, upsert, opts)
 	if err != nil {
 		log.Printf("Error while performing upsert: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
-	return Response{result: upsert}
+	return Response{Result: upsert}
 }
 
 func (c *Client) Find(database string, collection string, filter interface{}, sort interface{}, limit int64) Response {
@@ -99,14 +99,14 @@ func (c *Client) Find(database string, collection string, filter interface{}, so
 	cur, err := col.Find(context.Background(), filter, opts)
 	if err != nil {
 		log.Printf("Error while finding documents: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 	var results []bson.M
 	if err = cur.All(context.Background(), &results); err != nil {
 		log.Printf("Error while decoding documents: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
-	return Response{result: results}
+	return Response{Result: results}
 }
 
 func (c *Client) Aggregate(database string, collection string, pipeline interface{}) Response {
@@ -115,14 +115,14 @@ func (c *Client) Aggregate(database string, collection string, pipeline interfac
 	cur, err := col.Aggregate(context.Background(), pipeline)
 	if err != nil {
 		log.Printf("Error while aggregating: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 	var results []bson.M
 	if err = cur.All(context.Background(), &results); err != nil {
 		log.Printf("Error while decoding documents: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
-	return Response{result: results}
+	return Response{Result: results}
 }
 
 func (c *Client) FindOne(database string, collection string, filter map[string]string) Response {
@@ -131,10 +131,10 @@ func (c *Client) FindOne(database string, collection string, filter map[string]s
 	var result bson.M
 	err := col.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
-		return Response{err: err}
+		return Response{Err: err}
 	}
 
-	return Response{result: result}
+	return Response{Result: result}
 }
 
 func (c *Client) UpdateOne(database string, collection string, filter interface{}, data bson.D) Response {
@@ -144,7 +144,7 @@ func (c *Client) UpdateOne(database string, collection string, filter interface{
 	_, err := col.UpdateOne(context.Background(), filter, data)
 	if err != nil {
 		log.Printf("Error while updating the document: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 
 	return Response{}
@@ -159,7 +159,7 @@ func (c *Client) UpdateMany(database string, collection string, filter interface
 	_, err := col.UpdateMany(context.Background(), filter, update)
 	if err != nil {
 		log.Printf("Error while updating the documents: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 
 	return Response{}
@@ -171,16 +171,16 @@ func (c *Client) FindAll(database string, collection string) Response {
 	cur, err := col.Find(context.Background(), bson.D{{}})
 	if err != nil {
 		log.Printf("Error while finding documents: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 
 	var results []bson.M
 	if err = cur.All(context.Background(), &results); err != nil {
 		log.Printf("Error while decoding documents: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 
-	return Response{result: results}
+	return Response{Result: results}
 }
 
 func (c *Client) DeleteOne(database string, collection string, filter map[string]string) Response {
@@ -189,7 +189,7 @@ func (c *Client) DeleteOne(database string, collection string, filter map[string
 	_, err := col.DeleteOne(context.Background(), filter)
 	if err != nil {
 		log.Printf("Error while deleting the document: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 
 	return Response{}
@@ -201,7 +201,7 @@ func (c *Client) DeleteMany(database string, collection string, filter map[strin
 	_, err := col.DeleteMany(context.Background(), filter)
 	if err != nil {
 		log.Printf("Error while deleting the documents: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 
 	return Response{}
@@ -213,10 +213,10 @@ func (c *Client) Distinct(database string, collection string, field string, filt
 	result, err := col.Distinct(context.Background(), field, filter)
 	if err != nil {
 		log.Printf("Error while getting distinct values: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 
-	return Response{result: result}
+	return Response{Result: result}
 }
 
 func (c *Client) DropCollection(database string, collection string) Response {
@@ -225,7 +225,7 @@ func (c *Client) DropCollection(database string, collection string) Response {
 	err := col.Drop(context.Background())
 	if err != nil {
 		log.Printf("Error while dropping the collection: %v", err)
-		return Response{err: err}
+		return Response{Err: err}
 	}
 
 	return Response{}
@@ -237,9 +237,9 @@ func (c *Client) CountDocuments(database string, collection string, filter inter
 	count, err := col.CountDocuments(context.Background(), filter)
 	if err != nil {
 		log.Printf("Error while counting documents: %v", err)
-		return Response{err: err, result: 0}
+		return Response{Err: err, Result: 0}
 	}
-	return Response{result: count}
+	return Response{Result: count}
 }
 
 func (c *Client) FindOneAndUpdate(database string, collection string, filter interface{}, update interface{}) Response {
@@ -249,9 +249,9 @@ func (c *Client) FindOneAndUpdate(database string, collection string, filter int
 	result := col.FindOneAndUpdate(context.Background(), filter, update, opts)
 	if result.Err() != nil {
 		log.Printf("Error while finding and updating document: %v", result.Err())
-		return Response{err: result.Err()}
+		return Response{Err: result.Err()}
 	}
-	return Response{result: result}
+	return Response{Result: result}
 }
 
 func (c *Client) Disconnect() error {

@@ -57,7 +57,7 @@ func (m *Mongo) NewClient(config MongoConfig) *Client {
 func (*Mongo) NewClientWithOptions(cfg MongoConfig) *Client {
 	// Build the MongoDB connection URI
 	uri := fmt.Sprintf("mongodb://%s:%s@%s", cfg.Username, cfg.Password, cfg.URL)
-	fmt.Println("Connecting to MongoDB with URI:", uri)
+	log.Println("Connecting to MongoDB with URI:", uri)
 
 	clientOptions := &options.ClientOptions{}
 

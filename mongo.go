@@ -44,6 +44,7 @@ type MongoConfig struct {
 	Password    string
 	URL         string
 	Certificate string
+	UseTLS      bool
 }
 
 // NewClient represents the Client constructor (i.e. `new mongo.Client()`) and
@@ -54,30 +55,31 @@ func (m *Mongo) NewClient(config MongoConfig) *Client {
 }
 
 func (*Mongo) NewClientWithOptions(cfg MongoConfig) *Client {
-	// Load the certificate
-	caCert, err := os.ReadFile(cfg.Certificate)
-	if err != nil {
-		log.Fatalf("failed to read certificate file: %v", err)
-		return nil
-	}
-
-	// Create a certificate pool
-	caCertPool := x509.NewCertPool()
-	if !caCertPool.AppendCertsFromPEM(caCert) {
-		log.Fatalf("failed to append certificate to pool: %v", err)
-		return nil
-	}
-
-	// Configure TLS
-	tlsConfig := &tls.Config{
-		RootCAs: caCertPool,
-	}
-
 	// Build the MongoDB connection URI
 	uri := fmt.Sprintf("mongodb://%s:%s@%s", cfg.Username, cfg.Password, cfg.URL)
+	clientOptions := options.Client().ApplyURI(uri)
+	// Load the certificate
+	tlsConfig := &tls.Config{}
+	if cfg.UseTLS {
+		caCert, err := os.ReadFile(cfg.Certificate)
+		if err != nil {
+			log.Fatalf("failed to read certificate file: %v", err)
+			return nil
+		}
 
-	// Set client options
-	clientOptions := options.Client().ApplyURI(uri).SetTLSConfig(tlsConfig)
+		// Create a certificate pool
+		caCertPool := x509.NewCertPool()
+		if !caCertPool.AppendCertsFromPEM(caCert) {
+			log.Fatalf("failed to append certificate to pool: %v", err)
+			return nil
+		}
+
+		// Configure TLS
+		tlsConfig.RootCAs = caCertPool
+
+		// Set client options
+		clientOptions = clientOptions.SetTLSConfig(tlsConfig)
+	}
 
 	// Create the MongoDB client
 	client, err := mongo.Connect(context.Background(), clientOptions)

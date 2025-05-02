@@ -6,7 +6,7 @@ toolchain go1.24.0
 
 require (
 	go.k6.io/k6 v0.51.1-0.20240610082146-1f01a9bc2365
-	go.mongodb.org/mongo-driver v1.15.0
+	go.mongodb.org/mongo-driver v1.15.1
 )
 
 require (

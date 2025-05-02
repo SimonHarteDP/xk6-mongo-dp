@@ -51,13 +51,14 @@ type MongoConfig struct {
 // returns a new Mongo client object.
 // connURI -> mongodb://username:password@address:port/db?connect=direct
 func (m *Mongo) NewClient(config MongoConfig) *Client {
+
+	log.Print("MongoDB CFG", config)
 	return m.NewClientWithOptions(config)
 }
 
 func (*Mongo) NewClientWithOptions(cfg MongoConfig) *Client {
 	// Build the MongoDB connection URI
 	uri := fmt.Sprintf("mongodb://%s:%s@%s", cfg.Username, cfg.Password, cfg.URL)
-	log.Fatalf("Connecting to MongoDB with URI:", uri)
 
 	clientOptions := &options.ClientOptions{}
 

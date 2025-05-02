@@ -2,7 +2,11 @@ package xk6_mongo_dp
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"fmt"
 	"log"
+	"os"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,8 +30,8 @@ type Client struct {
 }
 
 type UpsertOneModel struct {
-	Query  interface{} `json:"query"`
-	Update interface{} `json:"update"`
+	Query  any `json:"query"`
+	Update any `json:"update"`
 }
 
 type Response struct {
@@ -35,25 +39,56 @@ type Response struct {
 	Result any
 }
 
+type MongoConfig struct {
+	Username    string `json:"username"`
+	Password    string `json:"password"`
+	URL         string `json:"url"`
+	Certificate string `json:"certificate"`
+	UseTLS      bool   `json:"use_tls"`
+}
+
 // NewClient represents the Client constructor (i.e. `new mongo.Client()`) and
 // returns a new Mongo client object.
 // connURI -> mongodb://username:password@address:port/db?connect=direct
-func (m *Mongo) NewClient(connURI string) *Client {
-	return m.NewClientWithOptions(connURI, options.Client())
-}
+func (m *Mongo) NewClient(config MongoConfig) *Client { return m.NewClientWithOptions(config) }
 
-func (*Mongo) NewClientWithOptions(connURI string, clientOptions *options.ClientOptions) *Client {
-	log.Print("start creating new client")
-	log.Printf("connURI: %s", connURI)
-	clientOptions.ApplyURI(connURI)
+func (*Mongo) NewClientWithOptions(cfg MongoConfig) *Client {
+	// Build the MongoDB connection URI
+	uri := fmt.Sprintf("mongodb://%s:%s@%s", cfg.Username, cfg.Password, cfg.URL)
+	clientOptions := &options.ClientOptions{}
 
+	// Load the certificate
+	tlsConfig := &tls.Config{}
+	if cfg.UseTLS {
+		caCert, err := os.ReadFile(cfg.Certificate)
+		if err != nil {
+			log.Fatalf("failed to read certificate file: %v", err)
+			return nil
+		}
+
+		// Create a certificate pool
+		caCertPool := x509.NewCertPool()
+		if !caCertPool.AppendCertsFromPEM(caCert) {
+			log.Fatalf("failed to append certificate to pool: %v", err)
+			return nil
+		}
+
+		// Configure TLS
+		tlsConfig.RootCAs = caCertPool
+
+		// Set client options
+		clientOptions = options.Client().ApplyURI(uri).SetTLSConfig(tlsConfig)
+	} else {
+		clientOptions = options.Client().ApplyURI(uri)
+	}
+
+	// Create the MongoDB client
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
-		log.Printf("Error while establishing a connection to MongoDB: %v", err)
+		log.Fatalf("failed to connect to MongoDB: %v", err)
 		return nil
 	}
 
-	log.Print("created new client")
 	return &Client{client: client}
 }
 

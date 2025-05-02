@@ -52,7 +52,7 @@ type MongoConfig struct {
 // connURI -> mongodb://username:password@address:port/db?connect=direct
 func (m *Mongo) NewClient(config MongoConfig) *Client {
 
-	log.Print("MongoDB CFG", config)
+	log.Fatal("MongoDB CFG", config)
 	return m.NewClientWithOptions(config)
 }
 

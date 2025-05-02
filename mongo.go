@@ -55,8 +55,6 @@ func (m *Mongo) NewClient(config MongoConfig) *Client { return m.NewClientWithOp
 func (*Mongo) NewClientWithOptions(cfg MongoConfig) *Client {
 	// Build the MongoDB connection URI
 	uri := fmt.Sprintf("mongodb://%s:%s@%s", cfg.Username, cfg.Password, cfg.URL)
-	log.Printf("MongoDB connection URI: %s", uri)
-	log.Printf("MongoDB config: %v", cfg)
 	clientOptions := &options.ClientOptions{}
 
 	// Load the certificate
@@ -82,11 +80,6 @@ func (*Mongo) NewClientWithOptions(cfg MongoConfig) *Client {
 		clientOptions = options.Client().ApplyURI(uri).SetTLSConfig(tlsConfig)
 	} else {
 		clientOptions = options.Client().ApplyURI(uri)
-	}
-
-	clientOptions.Auth = &options.Credential{
-		Username: cfg.Username,
-		Password: cfg.Password,
 	}
 
 	// Create the MongoDB client

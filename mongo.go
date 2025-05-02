@@ -40,11 +40,11 @@ type Response struct {
 }
 
 type MongoConfig struct {
-	Username    string
-	Password    string
-	URL         string
-	Certificate string
-	UseTLS      bool
+	Username    string `json:"username"`
+	Password    string `json:"password"`
+	URL         string `json:"url"`
+	Certificate string `json:"certificate"`
+	UseTLS      bool   `json:"use_tls"`
 }
 
 // NewClient represents the Client constructor (i.e. `new mongo.Client()`) and
@@ -52,7 +52,6 @@ type MongoConfig struct {
 // connURI -> mongodb://username:password@address:port/db?connect=direct
 func (m *Mongo) NewClient(config MongoConfig) *Client {
 
-	log.Fatal("MongoDB CFG", config)
 	return m.NewClientWithOptions(config)
 }
 

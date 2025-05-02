@@ -30,8 +30,8 @@ type Client struct {
 }
 
 type UpsertOneModel struct {
-	Query  interface{} `json:"query"`
-	Update interface{} `json:"update"`
+	Query  any `json:"query"`
+	Update any `json:"update"`
 }
 
 type Response struct {
@@ -50,10 +50,7 @@ type MongoConfig struct {
 // NewClient represents the Client constructor (i.e. `new mongo.Client()`) and
 // returns a new Mongo client object.
 // connURI -> mongodb://username:password@address:port/db?connect=direct
-func (m *Mongo) NewClient(config MongoConfig) *Client {
-
-	return m.NewClientWithOptions(config)
-}
+func (m *Mongo) NewClient(config MongoConfig) *Client { return m.NewClientWithOptions(config) }
 
 func (*Mongo) NewClientWithOptions(cfg MongoConfig) *Client {
 	// Build the MongoDB connection URI

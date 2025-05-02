@@ -96,18 +96,6 @@ func (*Mongo) NewClientWithOptions(cfg MongoConfig) *Client {
 		return nil
 	}
 
-	//return client
-	//log.Print("start creating new client")
-	//log.Printf("connURI: %s", connURI)
-	//clientOptions.ApplyURI(connURI)
-	//
-	//client, err := mongo.Connect(context.Background(), clientOptions)
-	//if err != nil {
-	//	log.Printf("Error while establishing a connection to MongoDB: %v", err)
-	//	return nil
-	//}
-	//
-	//log.Print("created new client")
 	return &Client{client: client}
 }
 
